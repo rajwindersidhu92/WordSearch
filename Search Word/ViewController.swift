@@ -12,8 +12,13 @@ class ViewController: UIViewController,UICollectionViewDelegate,UICollectionView
     
 
     @IBOutlet weak var collection_view: UICollectionView!
-    let gird_size = 10
-    var count = 0
+    let gird_size = 15
+    
+    private let sectionInsets = UIEdgeInsets(top: 10.0,
+    left: 10.0,
+    bottom: 0.0,
+    right: 0.0)
+    
     override func viewDidLoad() {
         
         super.viewDidLoad()
@@ -33,11 +38,38 @@ class ViewController: UIViewController,UICollectionViewDelegate,UICollectionView
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "collection_cell", for: indexPath) as! CollectionViewCellController
         cell.celllabel?.text = "a"
-        count = count + 1
-        print(count)
         return cell
     }
-        
-
 }
 
+extension ViewController : UICollectionViewDelegateFlowLayout {
+    
+  func collectionView(_ collectionView: UICollectionView,
+                      layout collectionViewLayout: UICollectionViewLayout,
+                      sizeForItemAt indexPath: IndexPath) -> CGSize {
+    
+    let paddingSpace = CGFloat(gird_size + 1) * sectionInsets .left
+    let availableWidth = view.frame.width - paddingSpace
+    let widthPerItem = availableWidth / CGFloat(gird_size)
+    print(CGFloat(gird_size))
+    print(CGFloat(paddingSpace))
+    print(CGFloat(view.frame.width))
+    print(availableWidth
+    )
+    print(widthPerItem
+    )
+    return CGSize(width: widthPerItem, height: widthPerItem)
+  }
+    func collectionView(_ collectionView: UICollectionView,
+                         layout collectionViewLayout: UICollectionViewLayout,
+                         insetForSectionAt section: Int) -> UIEdgeInsets {
+       return sectionInsets
+     }
+     
+     // 4
+     func collectionView(_ collectionView: UICollectionView,
+                         layout collectionViewLayout: UICollectionViewLayout,
+                         minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+       return sectionInsets.left
+     }
+}
