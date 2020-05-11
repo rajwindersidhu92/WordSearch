@@ -8,11 +8,13 @@
 
 import UIKit
 
-class ViewController: UIViewController,UICollectionViewDelegate,UICollectionViewDataSource {
+class ViewController: UIViewController {
     
 
     @IBOutlet weak var collection_view: UICollectionView!
-    let gird_size = 15
+    let gird_size = 10
+    let answers = ["Swift","Ios", "Coding", "SwiftUI"]
+    
     
     private let sectionInsets = UIEdgeInsets(top: 10.0,
     left: 10.0,
@@ -20,17 +22,35 @@ class ViewController: UIViewController,UICollectionViewDelegate,UICollectionView
     right: 0.0)
     
     override func viewDidLoad() {
-        
         super.viewDidLoad()
         collection_view.delegate = self
         collection_view.dataSource = self
         // Do any additional setup after loading the view
+        print(randomChar())
     }
     
-    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+    func randomChar() -> String {
+      let letters = "abcdefghijklmnopqrstuvwxyz"
+      return String((0..<1).map{ _ in letters.randomElement()! })
+    }
+    
+    func randomPosition() -> Int {
+      return Int.random(in: 0..<99)
+    }
+    
+    func randomPlacement() -> Int {
+        return Int.random(in: 1...8)
+    }
+    
+    
+}
+extension ViewController : UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         print(indexPath);
     }
+}
 
+extension ViewController : UICollectionViewDataSource{
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return gird_size * gird_size
     }
@@ -39,34 +59,33 @@ class ViewController: UIViewController,UICollectionViewDelegate,UICollectionView
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "collection_cell", for: indexPath) as! CollectionViewCellController
         cell.celllabel?.text = "a"
         return cell
+        
     }
+    
+    
+    
 }
 
 extension ViewController : UICollectionViewDelegateFlowLayout {
     
-  func collectionView(_ collectionView: UICollectionView,
+    func collectionView(_ collectionView: UICollectionView,
                       layout collectionViewLayout: UICollectionViewLayout,
                       sizeForItemAt indexPath: IndexPath) -> CGSize {
+
+        let paddingSpace = CGFloat(gird_size + 1) * sectionInsets .left
+        let availableWidth = view.frame.width - paddingSpace
+        let widthPerItem = availableWidth / CGFloat(gird_size)
+
+        return CGSize(width: widthPerItem, height: widthPerItem)
+    }
     
-    let paddingSpace = CGFloat(gird_size + 1) * sectionInsets .left
-    let availableWidth = view.frame.width - paddingSpace
-    let widthPerItem = availableWidth / CGFloat(gird_size)
-    print(CGFloat(gird_size))
-    print(CGFloat(paddingSpace))
-    print(CGFloat(view.frame.width))
-    print(availableWidth
-    )
-    print(widthPerItem
-    )
-    return CGSize(width: widthPerItem, height: widthPerItem)
-  }
     func collectionView(_ collectionView: UICollectionView,
                          layout collectionViewLayout: UICollectionViewLayout,
                          insetForSectionAt section: Int) -> UIEdgeInsets {
        return sectionInsets
      }
      
-     // 4
+
      func collectionView(_ collectionView: UICollectionView,
                          layout collectionViewLayout: UICollectionViewLayout,
                          minimumLineSpacingForSectionAt section: Int) -> CGFloat {
