@@ -10,11 +10,13 @@ import UIKit
 
 class ViewController: UIViewController {
     
-
+var count = 0
     @IBOutlet weak var collection_view: UICollectionView!
-    let gird_size = 10
+    let gird_size = 5
     let answers = ["Swift","Ios", "Coding", "SwiftUI"]
     
+    let directionPossibilities = ["RL", "LR", "TB", "BT", "TLBR" ,"BRTL","TRBL" , "BLTR"]
+
     
     private let sectionInsets = UIEdgeInsets(top: 10.0,
     left: 10.0,
@@ -26,7 +28,7 @@ class ViewController: UIViewController {
         collection_view.delegate = self
         collection_view.dataSource = self
         // Do any additional setup after loading the view
-        print(randomChar())
+        positionCharaters()
     }
     
     func randomChar() -> String {
@@ -34,12 +36,49 @@ class ViewController: UIViewController {
       return String((0..<1).map{ _ in letters.randomElement()! })
     }
     
-    func randomPosition() -> Int {
-      return Int.random(in: 0..<99)
+    func randomPosition(length : Int , direction : String) -> Int {
+        var total_cell = (gird_size * gird_size);
+        var pos =  Int.random(in: 0...total_cell )
+        var x = (pos/gird_size)
+        var y = pos - ((x) * gird_size)
+        //"RL", "LR", "TB", "BT", "TLBR" ,"BRTL","TRBL" , "BLTR"
+        
+        return pos
     }
     
-    func randomPlacement() -> Int {
-        return Int.random(in: 1...8)
+    func randomDirection() -> String {
+         var randomElement = directionPossibilities.randomElement()
+        return(randomElement!)
+    }
+    
+    func positionCharaters(){
+        for a in answers {
+            var direction = randomDirection();
+            var position = randomPosition(length: a.count ,direction: direction);
+            
+            
+            
+            print(position ,  direction)
+            
+            
+//            switch randomDirection {
+//            case 1:
+//
+//            case 2:
+//
+//            case 3:
+//
+//            case 4:
+//
+//
+//
+//            default:
+//                <#code#>
+//            }
+            for ch in a{
+              
+            }
+        }
     }
     
     
@@ -57,7 +96,8 @@ extension ViewController : UICollectionViewDataSource{
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "collection_cell", for: indexPath) as! CollectionViewCellController
-        cell.celllabel?.text = "a"
+        cell.celllabel?.text = String(count)
+        count = count + 1
         return cell
         
     }
