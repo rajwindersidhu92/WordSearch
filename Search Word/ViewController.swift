@@ -9,11 +9,16 @@
 import UIKit
 
 class ViewController: UIViewController {
+
+    var count = 0
+    var total_cell = 0
+    var pos = 0
     
-var count = 0
     @IBOutlet weak var collection_view: UICollectionView!
-    let gird_size = 5
-    let answers = ["Swift","Ios", "Coding", "SwiftUI"]
+    
+    let grid_size = 10
+    let answers = ["Swift","Ios","SwiftUI","Coding"]
+    var positionDict: [Int: String] = [:]
     
     let directionPossibilities = ["RL", "LR", "TB", "BT", "TLBR" ,"BRTL","TRBL" , "BLTR"]
 
@@ -25,10 +30,13 @@ var count = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        positionCharaters()
+        print(positionDict)
         collection_view.delegate = self
         collection_view.dataSource = self
         // Do any additional setup after loading the view
-        positionCharaters()
+        
     }
     
     func randomChar() -> String {
@@ -37,13 +45,31 @@ var count = 0
     }
     
     func randomPosition(length : Int , direction : String) -> Int {
-        var total_cell = (gird_size * gird_size);
-        var pos =  Int.random(in: 0...total_cell )
-        var x = (pos/gird_size)
-        var y = pos - ((x) * gird_size)
+        total_cell = (grid_size * grid_size)-1;
+        pos =  Int.random(in: 0...total_cell )
+        var x = (pos/grid_size)
+        var y = pos - ((x) * grid_size)
         //"RL", "LR", "TB", "BT", "TLBR" ,"BRTL","TRBL" , "BLTR"
-        
+        if(direction == "RL" && (y-length) < -1 ){
+            pos = randomPosition(length: length, direction: direction)
+        }else if (direction == "LR" && (y+length) > grid_size-1 ){
+            pos = randomPosition(length: length, direction: direction)
+        }else if (direction == "TB" && (x+length) > grid_size-1 ){
+            pos = randomPosition(length: length, direction: direction)
+        }else if (direction == "BT" && (x-length) < -1 ){
+            pos = randomPosition(length: length, direction: direction)
+        }else if (direction == "TLBR" && (((x + length) > grid_size-1) || ((y+length) > grid_size-1))) {
+            pos = randomPosition(length: length, direction: direction)
+        }else if (direction == "BRTL" && (((x-length) < -1) || ((y-length) < -1)) ){
+            pos = randomPosition(length: length, direction: direction)
+        }else if (direction == "TRBL" && (((x+length) > grid_size) || ((y-length) < -1)) ){
+            pos = randomPosition(length: length, direction: direction)
+        }else if (direction == "BLTR" && (((y+length) > grid_size) || ((x-length) < -1)) ){
+            pos = randomPosition(length: length, direction: direction)
+        }
+           
         return pos
+        
     }
     
     func randomDirection() -> String {
@@ -52,13 +78,41 @@ var count = 0
     }
     
     func positionCharaters(){
-        for a in answers {
+        for word in answers {
+            if(word.count > grid_size){
+                continue
+            }
             var direction = randomDirection();
-            var position = randomPosition(length: a.count ,direction: direction);
+            var position = randomPosition(length: word.count ,direction: direction);
+            
+            for ch in word{
+                positionDict [position] = String(ch)
+                var x = (position/grid_size)
+                var y = position - ((x) * grid_size)
+                
+                if(direction == "RL"){
+                   position = position - 1
+                }else if (direction == "LR"){
+                   position = position + 1
+                }else if (direction == "TB"){
+                   position = position + grid_size
+                }else if (direction == "BT"){
+                   position = position - grid_size
+                }else if (direction == "TLBR") {
+                   position = position + grid_size + 1
+                }else if (direction == "BRTL"){
+                   position = position - grid_size - 1
+                }else if (direction == "TRBL"  ){
+                   position = position + grid_size - 1
+                }else if (direction == "BLTR"){
+                   position = position - grid_size + 1
+                }
+
+               
+                
+            }
             
             
-            
-            print(position ,  direction)
             
             
 //            switch randomDirection {
@@ -75,13 +129,10 @@ var count = 0
 //            default:
 //                <#code#>
 //            }
-            for ch in a{
-              
-            }
+        
+            
         }
     }
-    
-    
 }
 extension ViewController : UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -91,16 +142,28 @@ extension ViewController : UICollectionViewDelegate {
 
 extension ViewController : UICollectionViewDataSource{
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return gird_size * gird_size
+        return grid_size * grid_size
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "collection_cell", for: indexPath) as! CollectionViewCellController
-        cell.celllabel?.text = String(count)
+        
+        
+        
+        let keyExists = positionDict[indexPath.row] != nil
+
+        if keyExists{
+            cell.celllabel?.text = positionDict[indexPath.row]
+        } else {
+          cell.celllabel?.text = randomChar()
+        }
+        
+        
         count = count + 1
         return cell
         
     }
+    
     
     
     
@@ -112,9 +175,9 @@ extension ViewController : UICollectionViewDelegateFlowLayout {
                       layout collectionViewLayout: UICollectionViewLayout,
                       sizeForItemAt indexPath: IndexPath) -> CGSize {
 
-        let paddingSpace = CGFloat(gird_size + 1) * sectionInsets .left
+        let paddingSpace = CGFloat(grid_size + 1) * sectionInsets .left
         let availableWidth = view.frame.width - paddingSpace
-        let widthPerItem = availableWidth / CGFloat(gird_size)
+        let widthPerItem = availableWidth / CGFloat(grid_size)
 
         return CGSize(width: widthPerItem, height: widthPerItem)
     }

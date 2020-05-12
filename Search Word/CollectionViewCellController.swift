@@ -11,7 +11,7 @@ import UIKit
 class CollectionViewCellController:UICollectionViewCell{
 
 @IBOutlet weak var celllabel : UILabel!
-
+    
     /*
  // MARK: - Navigation
 
