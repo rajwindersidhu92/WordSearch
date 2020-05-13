@@ -13,6 +13,9 @@ class ViewController: UIViewController {
     var count = 0
     var total_cell = 0
     var pos = 0
+    var playerCurrentDrag = [Int]()
+    var ans = ""
+    var yValue = 580
     
     @IBOutlet weak var collection_view: UICollectionView!
     
@@ -30,13 +33,82 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        addPanGesture(view: self.collection_view)
         positionCharaters()
         print(positionDict)
         collection_view.delegate = self
         collection_view.dataSource = self
         // Do any additional setup after loading the view
         
+    }
+    
+    
+     func addPanGesture(view: UIView) {
+         
+         let pan = UIPanGestureRecognizer(target: self, action: #selector(self.handlePan(sender:)))
+         view.addGestureRecognizer(pan)
+     }
+    
+    @objc func handlePan(sender: UIPanGestureRecognizer) {
+        switch sender.state {
+            
+        case .began,.changed:
+            
+            let touchPoint = sender.location(in: collection_view)
+//            let index = collection_view.indexPathForItem(at: touchPoint)
+            if let index = collection_view.indexPathForItem(at: touchPoint) {
+//                print(index.row)
+                if !playerCurrentDrag.contains(index.row) {
+                    playerCurrentDrag.append(index.row)
+                }
+            }
+        case .ended:
+            let touchPoint = sender.location(in: collection_view)
+            //   let index = collection_view.indexPathForItem(at: touchPoint)
+            if let index = collection_view.indexPathForItem(at: touchPoint) {
+                if !playerCurrentDrag.contains(index.row) {
+                    playerCurrentDrag.append(index.row)
+                }
+                print(playerCurrentDrag)
+                for i in playerCurrentDrag{
+                    let index_value = IndexPath(row: i, section: 0)
+                    print(index_value)
+                    
+                    
+                    let changed_cell = self.collection_view.dequeueReusableCell(withReuseIdentifier: "collection_cell", for: index_value) as! CollectionViewCellController
+                    changed_cell.backgroundColor = UIColor.red
+                    
+                }
+                for i in playerCurrentDrag{
+                    let keyExists = positionDict[i] != nil
+
+                    if keyExists{
+                       ans.append(positionDict[i] ?? "")
+                    } else {
+                       print("Wrong Answer")
+                    }
+                }
+                
+                
+                if (answers.contains(ans)){
+                  print(ans)
+                    
+                    let label = UILabel(frame: CGRect(x: 500, y: 200, width: 200, height: 21))
+                    label.center = CGPoint(x: 160, y: yValue)
+                    yValue = yValue + 30
+                    label.textAlignment = NSTextAlignment.center
+                    label.text = ans
+                    self.view.addSubview(label)
+                    
+                }
+                ans = ""
+                playerCurrentDrag = []
+            
+            }
+
+        default:
+            break
+        }
     }
     
     func randomChar() -> String {
@@ -103,8 +175,6 @@ class ViewController: UIViewController {
                 }
             }
         }
-        
-        
         return pos
         
     }
@@ -153,7 +223,8 @@ class ViewController: UIViewController {
 
 extension ViewController : UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print(indexPath);
+    
+        
     }
 }
 
